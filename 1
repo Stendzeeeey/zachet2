@@ -1,0 +1,111 @@
+Билет9. 1.	Написать программу, которая получает на вход N целых чисел и стоит по ним дерево поиска, 
+причем оно не должно содержать повторяющихся значений 
+(дубликаты игнорировать). Вывести полученное дерево на экран «боком». 
+Вывести на экран все листья дерева в убывающем порядке.
+
+
+#include <iostream>
+#include <set>
+
+using namespace std;
+
+class Node {
+public:
+    int data;
+    Node* left;
+    Node* right;
+
+    Node(int value) {
+        data = value;
+        left = NULL;
+        right = NULL;
+    }
+};
+
+class BST {
+public:
+    Node* root;
+    int size;
+
+    BST() {
+        root = NULL;
+        size = 0;
+    }
+
+    Node* insert(Node* node, int value) {
+        if (node == NULL) {
+            size++;
+            return new Node(value);
+        }
+
+        if (value < node->data)
+            node->left = insert(node->left, value);
+        else if (value > node->data)
+            node->right = insert(node->right, value);
+
+        return node;
+    }
+
+    void insert(int value) {
+        root = insert(root, value);
+    }
+
+    void print(Node* node, int level) {
+        if (node != NULL) {
+            print(node->right, level + 1);
+            for (int i = 0; i < level; i++)
+                cout << "   ";
+            cout << node->data << endl;
+            print(node->left, level + 1);
+        }
+    }
+
+    void print() {
+        print(root, 0);
+    }
+
+    void get_leaves(Node* node, multiset<int>& leaves) {
+        if (node != NULL) {
+            if (node->left == NULL && node->right == NULL)
+                leaves.insert(node->data);
+            get_leaves(node->left, leaves);
+            get_leaves(node->right, leaves);
+        }
+    }
+
+    void print_leaves() {
+        multiset<int> leaves;
+        get_leaves(root, leaves);
+
+        if (leaves.empty())
+            cout << "На дереве нет листьев" << endl;
+        else {
+            cout << "Листья дерева в порядке убывания:" << endl;
+            for (auto it = leaves.rbegin(); it != leaves.rend(); it++)
+                cout << *it << " ";
+            cout << endl;
+        }
+    }
+};
+
+int main() {
+    int N;
+    cout << "Введите количество целых чисел: ";
+    cin >> N;
+
+    BST tree;
+    cout << "Введите " << N << " целых чисел:" << endl;
+    for (int i = 0; i < N; i++) {
+        int value;
+        cin >> value;
+        tree.insert(value);
+    }
+
+    cout << endl << "Дерево:" << endl;
+    tree.print();
+
+    cout << endl;
+    tree.print_leaves();
+
+    return 0;
+}
